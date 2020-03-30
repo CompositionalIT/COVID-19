@@ -6,14 +6,20 @@ open System
 
 fsi.AddPrinter<DateTime>(fun dt -> dt.ToShortDateString())
 
-
 [<Literal>]
-let FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/01-22-2020.csv"
-type Daily = CsvProvider<FilePath>
+let V1FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/01-22-2020.csv"
+type DailyV1 = CsvProvider<V1FilePath>
+[<Literal>]
+let V2FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/03-22-2020.csv"
+type DailyV2 = CsvProvider<V2FilePath>
 
 let files =
     System.IO.Directory.GetFiles("csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
+    |> Seq.filter(fun r ->
+        let r = System.IO.Path.GetFileNameWithoutExtension r
+        System.DateTime.ParseExact(r, "MM-dd-yyyy", null) <= (DateTime(2020,3,21)))
     |> Seq.map System.IO.Path.GetFullPath
+
 
 let makeScatter (country, values) =
     let dates, values = values |> Seq.toArray |> Array.unzip
@@ -23,7 +29,7 @@ let makeScatter (country, values) =
 
 let allData =
     files
-    |> Seq.map Daily.Load
+    |> Seq.map DailyV1.Load
     |> Seq.collect(fun data -> data.Rows)
     |> Seq.distinctBy (fun row -> row.``Country/Region``, row.``Province/State``, row.``Last Update``.Date)
     |> Seq.sortBy (fun row -> row.``Last Update``.Date)
