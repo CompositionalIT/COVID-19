@@ -7,11 +7,8 @@ open System
 fsi.AddPrinter<DateTime>(fun dt -> dt.ToShortDateString())
 
 [<Literal>]
-let V1FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/01-22-2020.csv"
-type DailyV1 = CsvProvider<V1FilePath>
-[<Literal>]
-let V2FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/03-22-2020.csv"
-type DailyV2 = CsvProvider<V2FilePath>
+let FilePath = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/01-22-2020.csv"
+type Daily = CsvProvider<FilePath>
 
 let files =
     System.IO.Directory.GetFiles("csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
@@ -29,7 +26,7 @@ let makeScatter (country, values) =
 
 let allData =
     files
-    |> Seq.map DailyV1.Load
+    |> Seq.map Daily.Load
     |> Seq.collect(fun data -> data.Rows)
     |> Seq.distinctBy (fun row -> row.``Country/Region``, row.``Province/State``, row.``Last Update``.Date)
     |> Seq.sortBy (fun row -> row.``Last Update``.Date)
