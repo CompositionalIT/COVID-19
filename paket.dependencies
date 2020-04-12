@@ -9,3 +9,4 @@ nuget FSharp.Data
 nuget Saturn
 nuget Thoth.Json.Giraffe
 nuget XPlot.Plotly
+nuget Zanaptak.TypedCssClasses
